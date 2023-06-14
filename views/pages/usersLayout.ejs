@@ -1,0 +1,11 @@
+<% const breadcrumbs = [
+    { label: 'Home', url: '/' },
+    'Users'
+]; %>
+
+<% const adminSettings = {
+    'collapsedSiteDrawer': true
+} %>
+
+
+<%- include('layout', { pageTitle: 'Users', breadcrumbs: breadcrumbs,view:'users',params:{ onlineUsersCount:20, users:[] },adminSettings:adminSettings }) %>

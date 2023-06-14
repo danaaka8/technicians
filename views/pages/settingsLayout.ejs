@@ -1,0 +1,26 @@
+<% const breadcrumbs = [
+    { label: 'Home', url: '/' },
+    'Settings'
+]; %>
+
+<% const settings = {
+    siteName: 'Your Site Name',
+    timezones: [
+        { value: 'timezone1', label: 'Timezone 1' },
+        { value: 'timezone2', label: 'Timezone 2' },
+        // Add more timezones as needed
+    ],
+    timezone: 'timezone1', // The default selected timezone
+}; %>
+<% const user = {
+    username: 'JohnDoe',
+    email: 'johndoe@example.com',
+    // Add more user data as needed
+}; %>
+
+<% const adminSettings = {
+  'collapsedSiteDrawer': true
+} %>
+
+
+<%- include('layout', { pageTitle: 'Settings', breadcrumbs: breadcrumbs,view:'settings',params:{settings,user},adminSettings:adminSettings }) %>

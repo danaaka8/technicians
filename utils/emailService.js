@@ -4,14 +4,14 @@ const randomstring = require('randomstring');
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'your-email@gmail.com',
-    pass: 'your-email-password'
+    user: 'aloshhasso99944@gmail.com',
+    pass: 'cixvvdrknowojpye'
   }
 });
 
 exports.sendResetPasswordEmail = (email, otp) => {
   const mailOptions = {
-    from: 'your-email@gmail.com',
+    from: 'aloshhasso99944@gmail.com',
     to: email,
     subject: 'Reset Password',
     text: `Your OTP for password reset is: ${otp}`

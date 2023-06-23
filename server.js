@@ -1,10 +1,19 @@
 require("dotenv").config();
 require("./utils/mongodbConnection");
+const reservationRoutes = require('./routes/reservationRouter');
+const statisticsRoutes = require('./routes/statisticsRouter');
+
+
+
+const cors = require('cors')
+
 
 const express = require("express");
 const app = express();
 const port = process.env.PORT || 3000;
-
+app.use(cors({
+  origin:'*',
+}))
 // const path = require("path");
 
 const userRouter = require('./routes/usersRouter');
@@ -31,7 +40,8 @@ app.use(bodyParser.json());
 
 // app.get("/", (req, res) => res.render('pages/home'));
 
-app.use('/api', userRouter,technicianRouter);
+app.use('/api', userRouter,technicianRouter,reservationRoutes);
+app.use('/statistics',statisticsRoutes)
 // app.use('/api', technicianRouter);
 
 

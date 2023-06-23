@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/usersModel');
+const jwt = require('jsonwebtoken');
 const { sendResetPasswordEmail, generateOTP } = require('../utils/emailService');
 
 exports.sendResetPasswordEmail = async (req, res) => {
@@ -55,7 +56,16 @@ exports.verifyResetPasswordOTP = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find({},{__v:false});
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, 'your-secret-key');
+    const userId = decodedToken.userId;
+    const role = decodedToken.role;
+
+    if (role !== 'admin') {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+
+    const users = await User.find({}, { __v: false });
     return res.status(200).json(users);
   } catch (error) {
     return res.status(500).json({ error: 'Internal server error' });
@@ -82,7 +92,13 @@ exports.register = async (req, res) => {
 
     const savedUser = await newUser.save();
 
-    return res.status(200).json(savedUser);
+    const token = jwt.sign(
+      { userId: savedUser._id, email: savedUser.email, role: 'user' },
+      'your-secret-key',
+      { expiresIn: '1h' }
+    );
+
+    return res.status(200).json({ token: token, user: savedUser });
   } catch (error) {
     return res.status(500).json({ error: 'Internal server error' });
   }
@@ -101,7 +117,13 @@ exports.login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (isMatch) {
-      return res.status(200).json(user);
+      const token = jwt.sign(
+        { userId: user._id, email: user.email, role: 'user' },
+        'your-secret-key',
+        { expiresIn: '1h' }
+      );
+
+      return res.status(200).json({ token: token, user: user });
     } else {
       return res.status(401).json({ error: 'Invalid password' });
     }
@@ -113,6 +135,14 @@ exports.login = async (req, res) => {
 exports.getUser = async (req, res) => {
   try {
     const userId = req.params.id;
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, 'your-secret-key');
+    const authenticatedUserId = decodedToken.userId;
+    const role = decodedToken.role;
+
+    if (role === 'user' && userId !== authenticatedUserId) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
 
     const user = await User.findById(userId);
 
@@ -129,6 +159,14 @@ exports.getUser = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   try {
     const userId = req.params.id;
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, 'your-secret-key');
+    const authenticatedUserId = decodedToken.userId;
+    const role = decodedToken.role;
+
+    if (role === 'user' && userId !== authenticatedUserId) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
 
     const deletedUser = await User.findByIdAndDelete(userId);
 

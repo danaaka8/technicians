@@ -11,6 +11,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
+  createdAt:{
+    type:Date,
+    default:new Date()
+  },
   password: {
     type: String,
     required: true
@@ -18,7 +22,13 @@ const userSchema = new mongoose.Schema({
   resetPasswordOTP: {
     type: String,
     default: null
+  },
+  status:{
+    type:String,
+    enum:['online','offline'],
+    default:'offline'
   }
+  
 });
 
 // Define the User model

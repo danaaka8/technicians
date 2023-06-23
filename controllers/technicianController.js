@@ -1,9 +1,32 @@
+const { log } = require('console');
 const Technician = require('../models/technicianModel');
+const fs = require('fs');
+
 
 // Create a new technician
 const createTechnician = async (req, res) => {
   try {
     const { image, name, email, phone, location, category } = req.body;
+    log(req.body)
+  
+    // Get the uploaded file from the request
+  const file = req.file;
+  log(file)
+
+  if (!file) {
+    return res.status(400).json({ error: 'Image file is required' });
+  }
+
+  // Read the file as binary data
+  const data = fs.readFileSync(file.path);
+
+  // Encode the file data as base64 string
+  const base64String = data.toString('base64');
+
+  // Delete the temporary file
+  fs.unlinkSync(file.path);
+
+  console.log(base64String);
 
     // Check if email already exists
     const existingTechnician = await Technician.findOne({ email: email });
@@ -12,7 +35,7 @@ const createTechnician = async (req, res) => {
     }
 
     // Create a new technician instance
-    const newTechnician = new Technician({ image, name, email, phone, location, category, rating: 0, numServicesDone: 0 });
+    const newTechnician = new Technician({ image:base64String, name, email, phone, location, category, rating: 0, numServicesDone: 0 });
 
     // Save the technician to the database
     const savedTechnician = await newTechnician.save();

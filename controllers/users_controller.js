@@ -74,7 +74,7 @@ exports.getAllUsers = async (req, res) => {
 
 exports.register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, location } = req.body;
 
     const existingUser = await User.findOne({ email: email });
 
@@ -83,22 +83,18 @@ exports.register = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
     const newUser = new User({
       name: name,
       email: email,
-      password: hashedPassword
+      password: hashedPassword,
+      location: location
     });
 
     const savedUser = await newUser.save();
 
-    const token = jwt.sign(
-      { userId: savedUser._id, email: savedUser.email, role: 'user' },
-      'your-secret-key',
-      { expiresIn: '1h' }
-    );
 
-    return res.status(200).json({ token: token, user: savedUser });
+
+    return res.status(200).json({ user: savedUser });
   } catch (error) {
     return res.status(500).json({ error: 'Internal server error' });
   }
@@ -120,7 +116,7 @@ exports.login = async (req, res) => {
       const token = jwt.sign(
         { userId: user._id, email: user.email, role: 'user' },
         'your-secret-key',
-        { expiresIn: '1h' }
+        { expiresIn: '24h' }
       );
 
       return res.status(200).json({ token: token, user: user });
@@ -194,6 +190,36 @@ exports.updateUser = async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { name: name, email: email },
+      { new: true }
+    );
+
+    if (updatedUser) {
+      return res.status(200).json(updatedUser);
+    } else {
+      return res.status(404).json({ error: 'User not found' });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const fs = require('fs');
+const { log } = require('console');
+
+exports.uploadImage = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    if (!req.file) {
+      log('here')
+      return res.status(400).json({ error: 'No image file provided' });
+    }
+
+    const image = fs.readFileSync(req.file.path, { encoding: 'base64' });
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { image: image },
       { new: true }
     );
 

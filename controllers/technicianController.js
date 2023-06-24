@@ -1,17 +1,19 @@
 const { log } = require('console');
 const Technician = require('../models/technicianModel');
 const fs = require('fs');
+const Category = require('../models/categoryModel')
 
 
 // Create a new technician
 const createTechnician = async (req, res) => {
   try {
     const { image, name, email, phone, location, category } = req.body;
-    log(req.body)
   
-    // Get the uploaded file from the request
+    const existingCategory = await Category.findById(category);
+    if (!existingCategory) {
+      return res.status(404).json({ error: 'Category not found' });
+    }
   const file = req.file;
-  log(file)
 
   if (!file) {
     return res.status(400).json({ error: 'Image file is required' });
@@ -35,7 +37,7 @@ const createTechnician = async (req, res) => {
     }
 
     // Create a new technician instance
-    const newTechnician = new Technician({ image:base64String, name, email, phone, location, category, rating: 0, numServicesDone: 0 });
+    const newTechnician = new Technician({ image:base64String, name, email, phone, location, category:existingCategory._id, rating: 0, numServicesDone: 0 });
 
     // Save the technician to the database
     const savedTechnician = await newTechnician.save();
@@ -49,7 +51,15 @@ const createTechnician = async (req, res) => {
 // Get all technicians
 const getAllTechnicians = async (req, res) => {
   try {
-    const technicians = await Technician.find();
+    const { categoryId } = req.query;
+    let technicians;
+
+    if (categoryId) {
+      technicians = await Technician.find({ category: categoryId }).populate('category', 'name');
+    } else {
+      technicians = await Technician.find().populate('category', 'name');
+    }
+
     res.json(technicians);
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
@@ -60,7 +70,7 @@ const getAllTechnicians = async (req, res) => {
 const getTechnicianById = async (req, res) => {
   try {
     const { id } = req.params;
-    const technician = await Technician.findById(id);
+    const technician = await Technician.findById(id).populate('category', 'name');
 
     if (!technician) {
       return res.status(404).json({ error: 'Technician not found' });
@@ -84,11 +94,25 @@ const updateTechnician = async (req, res) => {
       return res.status(400).json({ error: 'Email already exists' });
     }
 
+    const existingCategory = await Category.findById(category);
+    if (!existingCategory) {
+      return res.status(404).json({ error: 'Category not found' });
+    }
+
     const updatedTechnician = await Technician.findByIdAndUpdate(
       id,
-      { image, name, phone, location, category },
+      {
+        image,
+        name,
+        email,
+        phone,
+        location,
+        available,
+        workTime,
+        category: existingCategory._id
+      },
       { new: true }
-    );
+    ).populate('category', 'name');
 
     if (!updatedTechnician) {
       return res.status(404).json({ error: 'Technician not found' });

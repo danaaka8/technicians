@@ -11,9 +11,9 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  createdAt:{
-    type:Date,
-    default:new Date()
+  createdAt: {
+    type: Date,
+    default: new Date()
   },
   password: {
     type: String,
@@ -23,12 +23,18 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null
   },
-  status:{
-    type:String,
-    enum:['online','offline'],
-    default:'offline'
+  status: {
+    type: String,
+    default: 'offline'
+  },
+  image: {
+    type: String,
+    default:null
+  },
+  location: {
+    type: String,
+    required: true
   }
-  
 });
 
 // Define the User model

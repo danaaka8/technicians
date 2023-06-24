@@ -39,8 +39,10 @@ app.use(bodyParser.json());
 // });
 
 // app.get("/", (req, res) => res.render('pages/home'));
+const categoryRouter = require('./routes/categoryRouter')
+const otpRouter = require('./routes/otpRouter')
 
-app.use('/api', userRouter,technicianRouter,reservationRoutes);
+app.use(userRouter,technicianRouter,reservationRoutes,categoryRouter,otpRouter);
 app.use('/statistics',statisticsRoutes)
 // app.use('/api', technicianRouter);
 

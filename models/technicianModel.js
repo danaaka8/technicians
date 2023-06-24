@@ -23,12 +23,20 @@ const technicianSchema = new mongoose.Schema({
     required: true
   },
   category: {
-    type: String,
-    required: true
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Category'
   },
   rating: {
     type: Number,
     default: 0
+  },
+  createdAt:{
+    type:Date,
+    default:new Date()
+  },
+  reviews:{
+    type:Number,
+    default:0
   },
   numServicesDone: {
     type: Number,

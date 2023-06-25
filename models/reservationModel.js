@@ -11,13 +11,16 @@ const reservationSchema = new mongoose.Schema({
     ref: 'Technician',
     required: true
   },
-  timeSlot: {
+  date: {
     type: String,
     required: true
   },
+  time:{
+    type:String,
+    required:true
+  },
   status:{
     type:String,
-    enum:['done,pending'],
     default:'pending'
   }
   // Add other relevant fields as needed
@@ -25,4 +28,4 @@ const reservationSchema = new mongoose.Schema({
 
 const Reservation = mongoose.model('Reservation', reservationSchema);
 
-module.exports = Reservation;
+module.exports = Reservation; 

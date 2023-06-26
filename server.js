@@ -2,8 +2,7 @@ require("dotenv").config();
 require("./utils/mongodbConnection");
 const reservationRoutes = require('./routes/reservationRouter');
 const statisticsRoutes = require('./routes/statisticsRouter');
-
-
+const managerRoute = require('./routes/managersRoute')
 
 const cors = require('cors')
 
@@ -18,6 +17,7 @@ app.use(cors({
 
 const userRouter = require('./routes/usersRouter');
 const technicianRouter = require('./routes/technicianRouter');
+
 
 
 // const cookieParser = require("cookie-parser");
@@ -41,9 +41,16 @@ app.use(bodyParser.json());
 // app.get("/", (req, res) => res.render('pages/home'));
 const categoryRouter = require('./routes/categoryRouter')
 const otpRouter = require('./routes/otpRouter')
+const popularTechnician = require('./routes/popularTechnicianRouter')
 
-app.use(userRouter,technicianRouter,reservationRoutes,categoryRouter,otpRouter);
+app.use(userRouter,technicianRouter,reservationRoutes,categoryRouter,otpRouter,popularTechnician);
 app.use('/statistics',statisticsRoutes)
+app.use('/managers',managerRoute)
+
+const completedReservationRouter = require('./routes/completedReservationRouter');
+
+app.use('/completedReservations', completedReservationRouter);
+
 // app.use('/api', technicianRouter);
 
 

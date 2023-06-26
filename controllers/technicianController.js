@@ -28,7 +28,6 @@ const createTechnician = async (req, res) => {
   // Delete the temporary file
   fs.unlinkSync(file.path);
 
-  console.log(base64String);
 
     // Check if email already exists
     const existingTechnician = await Technician.findOne({ email: email });
@@ -52,10 +51,15 @@ const createTechnician = async (req, res) => {
 const getAllTechnicians = async (req, res) => {
   try {
     const { categoryId } = req.query;
+    console.log(categoryId);
     let technicians;
 
     if (categoryId) {
-      technicians = await Technician.find({ category: categoryId }).populate('category', 'name');
+      technicians = await Technician.find({ category: categoryId }).populate({
+        path:'category',
+        ref:'Category'
+      });
+      console.log(technicians);
     } else {
       technicians = await Technician.find().populate('category', 'name');
     }

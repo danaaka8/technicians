@@ -34,5 +34,9 @@ router.delete('/users/:id', UserController.deleteUser);
 
 router.post('/users/login', UserController.login);
 
+router.post('/users/favorites',UserController.getAllFavoriteTechnicians)
+router.delete('/users/favorites/:id',UserController.deleteFavoriteTech)
+router.post('/users/favorites/create',UserController.createFavoriteTech)
+
 
 module.exports = router

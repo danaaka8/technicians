@@ -29,7 +29,14 @@ exports.createReservation = async (req, res) => {
 
 exports.getReservations = async (req, res) => {
   try {
-    const reservations = await Reservation.find();
+    const reservations = await Reservation.find().populate('userId').populate({
+      path:'technicianId',
+      ref:'Technician',
+      populate:{
+        path:'category',
+        ref:'Category'
+      }
+    });
     return res.status(200).json(reservations);
   } catch (error) {
     return res.status(500).json({ error: 'Internal server error' });
@@ -41,24 +48,17 @@ exports.getUserReservations = async (req, res) => {
       const { userId } = req.params;
 
     const userReservations = await Reservation.find({ userId })
-      .populate('technicianId');
+      .populate({
+        path:'technicianId',
+        ref:'Technician',
+        populate:{
+          path:'category',
+          ref:'Category'
+        }
+      });
+      
 
-    // Get the technician data for each reservation
-    const technicianIds = userReservations.map(reservation => reservation.technicianId);
-    const technicians = await Technician.find({ _id: { $in: technicianIds } });
 
-    // Map the technician data to their respective reservations
-    const technicianMap = technicians.reduce((map, technician) => {
-      map[technician._id] = technician;
-      return map;
-    }, {});
-
-    // Add the technician data to the reservations
-    const populatedReservations = userReservations.map(reservation => {
-      reservation.technicianId = technicianMap[reservation.technicianId._id];
-      return reservation;
-    });
-      console.log(userReservations);
       return res.status(200).json(userReservations);
     } catch (error) {
       return res.status(500).json({ error: 'Internal server error' });

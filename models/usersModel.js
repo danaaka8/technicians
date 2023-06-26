@@ -11,17 +11,22 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
+  phone:{
+    type:String,
+    required:true,
+    unique:true
+  },
+  favorites:{
+    type:[String],
+    default:[]
+  },
   createdAt: {
-    type: Date,
-    default: new Date()
+    type: String,
+    default: Date.now().toString()
   },
   password: {
     type: String,
     required: true
-  },
-  resetPasswordOTP: {
-    type: String,
-    default: null
   },
   status: {
     type: String,

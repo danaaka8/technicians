@@ -1,5 +1,6 @@
 const Otp = require('../models/otpModel');
 const User = require('../models/usersModel');
+const bcrypt = require('bcrypt')
 const {generateOTP,sendResetPasswordEmail} = require('../utils/emailService')
 
 exports.sendResetCode = async (req, res) => {
@@ -35,8 +36,7 @@ exports.verifyResetCode = async (req, res) => {
       return res.status(404).json({ error: 'Invalid reset code' });
     }
 
-    // Delete the OTP document
-    await otp.delete();
+
 
     return res.status(200).json({ message: 'Reset code verified successfully' });
   } catch (error) {
@@ -48,17 +48,18 @@ exports.verifyResetCode = async (req, res) => {
 exports.changePassword = async (req, res) => {
   try {
     const { email, newPassword } = req.body;
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    let x = await User.findOne({ email})
 
     // Find the user document
-    const user = await User.findOne({ email });
+    const user = await User.findOneAndUpdate({ email },{
+      password:hashedPassword
+    },{new:true});
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
-
-    // Update the user's password
-    user.password = newPassword;
-    await user.save();
 
     return res.status(200).json({ message: 'Password changed successfully' });
   } catch (error) {

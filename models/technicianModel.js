@@ -14,6 +14,10 @@ const technicianSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
+  popular:{
+    type: Boolean,
+    default:false
+  },
   phone: {
     type: String,
     required: true
@@ -31,8 +35,8 @@ const technicianSchema = new mongoose.Schema({
     default: 0
   },
   createdAt:{
-    type:Date,
-    default:new Date()
+    type:String,
+    default:Date.now().toString()
   },
   reviews:{
     type:Number,
@@ -57,7 +61,7 @@ const technicianSchema = new mongoose.Schema({
     }
   },
   price:{
-    type:mongoose.Schema.Types.Number,
+    type:Number,
     default:0.0
   }
 });

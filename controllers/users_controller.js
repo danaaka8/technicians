@@ -56,9 +56,8 @@ exports.verifyResetPasswordOTP = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
   try {
-    const token = req.headers.authorization.split(' ')[1];
-    const decodedToken = jwt.verify(token, 'your-secret-key');
-    const userId = decodedToken.userId;
+    const token = req.headers.token;
+    const decodedToken = jwt.verify(token, 'ManagerLoginKey');
     const role = decodedToken.role;
 
     if (role !== 'admin') {
@@ -74,7 +73,8 @@ exports.getAllUsers = async (req, res) => {
 
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, location } = req.body;
+    const { name, email, password, location, phone } = req.body;
+    console.log(req.body);
 
     const existingUser = await User.findOne({ email: email });
 
@@ -87,7 +87,8 @@ exports.register = async (req, res) => {
       name: name,
       email: email,
       password: hashedPassword,
-      location: location
+      location: location,
+      phone:phone
     });
 
     const savedUser = await newUser.save();
@@ -131,14 +132,6 @@ exports.login = async (req, res) => {
 exports.getUser = async (req, res) => {
   try {
     const userId = req.params.id;
-    const token = req.headers.authorization.split(' ')[1];
-    const decodedToken = jwt.verify(token, 'your-secret-key');
-    const authenticatedUserId = decodedToken.userId;
-    const role = decodedToken.role;
-
-    if (role === 'user' && userId !== authenticatedUserId) {
-      return res.status(403).json({ error: 'Forbidden' });
-    }
 
     const user = await User.findById(userId);
 
@@ -204,7 +197,6 @@ exports.updateUser = async (req, res) => {
 };
 
 const fs = require('fs');
-const { log } = require('console');
 
 exports.uploadImage = async (req, res) => {
   try {
@@ -232,3 +224,64 @@ exports.uploadImage = async (req, res) => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+const Technician = require('../models/technicianModel')
+
+exports.getAllFavoriteTechnicians = async (req,res) =>{
+  const techs = JSON.parse(req.body.techs)
+  console.log(techs);
+  techsArr = []
+
+  try{
+    for(tech of techs){
+      console.log(tech);
+      let data = await Technician.findOne({ _id:tech });
+      techsArr.push(data)
+    }
+
+    return res.status(200).json(techsArr)
+  }catch{
+    return res.status(500).send('something went wrong')
+  }
+}
+
+
+exports.createFavoriteTech = async (req,res) =>{
+  const { userId,id } = req.body
+
+  try{
+    let user = await User.findOne({ _id:userId })
+    let techs = user.favorites
+    techs.push(id)
+
+    await User.findOneAndUpdate({_id:userId},{
+      favorites:techs
+    },{new:true})
+
+    res.json(techs)
+  }catch{
+    res.status(500).send('something went wrong')
+  }
+}
+
+exports.deleteFavoriteTech = async (req,res) =>{
+  const { id } = req.params
+  const { userId } = req.body
+
+
+  try{
+    let user = await User.findOne({ _id:userId })
+    let techs = user.favorites
+    let filtered = techs.filter(t => t != id)
+
+    await User.findOneAndUpdate({_id:userId},{
+      favorites:filtered
+    },{new:true})
+
+    res.json(filtered)
+  }catch{
+    res.status(500).send('something went wrong')
+  }
+
+
+}

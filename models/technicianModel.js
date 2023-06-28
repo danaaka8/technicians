@@ -50,15 +50,13 @@ const technicianSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
-  workTime: {
-    from: {
-      type: String,
-      required: true
-    },
-    to: {
-      type: String,
-      required: true
-    }
+  from: {
+    type: String,
+    required: true
+  },
+  to: {
+    type: String,
+    required: true
   },
   price:{
     type:Number,

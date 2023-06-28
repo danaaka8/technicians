@@ -235,7 +235,10 @@ exports.getAllFavoriteTechnicians = async (req,res) =>{
   try{
     for(tech of techs){
       console.log(tech);
-      let data = await Technician.findOne({ _id:tech });
+      let data = await Technician.findOne({ _id:tech }).populate({
+        path:'category',
+        ref:'Category'
+      });
       techsArr.push(data)
     }
 

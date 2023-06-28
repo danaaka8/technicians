@@ -26,7 +26,7 @@ router.get('/technicians/:id', technicianController.getTechnicianById);
 router.post('/technicians', upload.single('image'),technicianController.createTechnician);
 
 // Update a technician
-router.put('/technicians/:id', technicianController.updateTechnician);
+router.put('/technicians/:id',upload.single('image'), technicianController.updateTechnician);
 
 // Delete a technician
 router.delete('/technicians/:id', technicianController.deleteTechnician);

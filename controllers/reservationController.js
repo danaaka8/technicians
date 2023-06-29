@@ -45,26 +45,35 @@ exports.getReservations = async (req, res) => {
 };
 
 exports.getUserReservations = async (req, res) => {
-    try {
-      const { userId } = req.params;
+  try {
+    const { userId } = req.params;
 
-    const userReservations = await Reservation.find({ userId })
-      .populate({
-        path:'technicianId',
-        ref:'Technician',
-        populate:{
-          path:'category',
-          ref:'Category'
-        }
-      });
-      
+    const userReservations = await Reservation.find({ userId });
+    const reservations = [];
 
+    for (const reservation of userReservations) {
+      try {
+        const populatedReservation = await reservation.populate({
+          path: 'technicianId',
+          ref: 'Technician',
+          populate: {
+            path: 'category',
+            ref: 'Category'
+          }
+        })
 
-      return res.status(200).json(userReservations);
-    } catch (error) {
-      return res.status(500).json({ error: 'Internal server error' });
+        reservations.push(populatedReservation);
+      } catch (error) {
+        continue
+      }
     }
-  };
+
+    return res.status(200).json(reservations);
+  } catch (error) {
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 
 exports.deleteReservation = async (req, res) => {
   try {

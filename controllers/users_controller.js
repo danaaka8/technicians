@@ -148,14 +148,7 @@ exports.getUser = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   try {
     const userId = req.params.id;
-    const token = req.headers.authorization.split(' ')[1];
-    const decodedToken = jwt.verify(token, 'your-secret-key');
-    const authenticatedUserId = decodedToken.userId;
-    const role = decodedToken.role;
-
-    if (role === 'user' && userId !== authenticatedUserId) {
-      return res.status(403).json({ error: 'Forbidden' });
-    }
+  
 
     const deletedUser = await User.findByIdAndDelete(userId);
 
@@ -229,23 +222,22 @@ const Technician = require('../models/technicianModel')
 
 exports.getAllFavoriteTechnicians = async (req,res) =>{
   const techs = JSON.parse(req.body.techs)
-  console.log(techs);
   techsArr = []
 
-  try{
-    for(tech of techs){
-      console.log(tech);
+  for(let tech in techs){
+    try{
       let data = await Technician.findOne({ _id:tech }).populate({
         path:'category',
         ref:'Category'
       });
       techsArr.push(data)
+  
+    }catch{
+      continue
     }
-
-    return res.status(200).json(techsArr)
-  }catch{
-    return res.status(500).send('something went wrong')
   }
+
+  return res.status(200).json(techsArr)
 }
 
 

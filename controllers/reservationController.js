@@ -48,7 +48,7 @@ exports.getUserReservations = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const userReservations = await Reservation.find({ userId });
+    const userReservations = await Reservation.find({ userId }).populate('userId');
     const reservations = [];
 
     for (const reservation of userReservations) {

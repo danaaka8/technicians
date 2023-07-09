@@ -52,8 +52,12 @@ const wss = new WebSocket.Server({ server });
 // Handle WebSocket connections
 wss.on('connection', (ws,req) => {
   console.log('connected')
-  const userId = req.query.userId || req.headers['userid']; // Extract the user ID from the query parameter or custom header
-
+  const userId = req.headers['userid']; // Extract the user ID from the query parameter or custom header
+  console.log(userId)
+  ws.send(JSON.strigify({
+    title:"websocket",
+    body:"websocket body"
+  }))
   addConnection(userId, ws);
 
   // Handle received messages

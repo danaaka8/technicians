@@ -42,7 +42,6 @@ exports.createCompletedReservation = async (req, res) => {
       }
     })
 
-    let user = await User.findOne({ _id:user })
     let notifications = user.notifications
     notifications.push({
       title:"Zainlak Reservations",

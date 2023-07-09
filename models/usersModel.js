@@ -24,9 +24,18 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: Date.now().toString()
   },
+  notifications:{
+    type:mongoose.Schema.Types.Array,
+    default:[]
+
+  },
   password: {
     type: String,
     required: true
+  },
+  deviceToken:{
+    type:String,
+    default:null
   },
   status: {
     type: String,

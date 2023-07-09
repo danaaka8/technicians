@@ -1,5 +1,5 @@
-const { sendToClient } = require('../websocket');
 const CompletedReservation = require('../models/completedReservation');
+const axios = require('axios')
 
 exports.getCompletedReservations = async (req, res) => {
   try {
@@ -9,6 +9,8 @@ exports.getCompletedReservations = async (req, res) => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+const User = require('../models/usersModel')
 
 exports.createCompletedReservation = async (req, res) => {
   const { completeTime, user, technician, category, price } = req.body;
@@ -21,11 +23,32 @@ exports.createCompletedReservation = async (req, res) => {
       category,
       price
     });
+    let user = await User.findOne({ _id:user })
 
-    sendToClient(user,JSON.stringify({
-      title:"Zainlak Booking",
-      body:"Your Booking Is Done"
-    }))
+
+    await this.axios({
+      method:"POST",
+      url:"https://fcm.googleapis.com/fcm/send",
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization': "key=AAAAbq2fgnE:APA91bG7AnjHTe-bZhlLGQS1XZyepocG_P20NRwLHDbW9YHdlUWQqNRvaDQWHosVLDvYT4zA-L5y3EPozJc_CYaeiGoAptA_M3x68q8nIrg-1NgvAnRqr0Y4T9V-9YZbNOsl42gshP5p"
+      },
+      data:{
+        notification:{
+          title:'Zainlak Reservations',
+          body:'Your Reservation Is Done'
+        },
+        to:user.deviceToken
+      }
+    })
+
+    let user = await User.findOne({ _id:user })
+    let notifications = user.notifications
+    notifications.push({
+      title:"Zainlak Reservations",
+      body:"Your Reservations Is Done",
+      date:Date.now()
+    })
 
     return res.status(201).json(completedReservation);
   } catch (error) {

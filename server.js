@@ -3,8 +3,6 @@ require("./utils/mongodbConnection");
 const reservationRoutes = require('./routes/reservationRouter');
 const statisticsRoutes = require('./routes/statisticsRouter');
 const managerRoute = require('./routes/managersRoute')
-const WebSocket = require('ws');
-const { addConnection, removeConnection, sendToAllClients } = require('./websocket');
 
 const cors = require('cors')
 
@@ -46,31 +44,3 @@ app.get('*',(req,res) =>{
 })
 
 const server = app.listen(port, () => console.log(`Example app listening on port ${port}!`));
-
-const wss = new WebSocket.Server({ server });
-
-// Handle WebSocket connections
-wss.on('connection', (ws,req) => {
-  console.log('connected')
-  const userId = req.headers['userid']; // Extract the user ID from the query parameter or custom header
-  console.log(userId)
-  ws.send(JSON.strigify({
-    title:"websocket",
-    body:"websocket body"
-  }))
-  addConnection(userId, ws);
-
-  // Handle received messages
-  ws.on('message', (message) => {
-    console.log(`Received message: ${message}`);
-
-    // Process the received message and send a response if needed
-    // ...
-  });
-
-  // Handle WebSocket connection closure
-  ws.on('close', () => {
-    console.log('Connection closed');
-    removeConnection(userId);
-  });
-});

@@ -26,11 +26,11 @@ const createTechnician = async (req, res) => {
       return res.status(400).json({ error: 'Email already exists' });
     }
 
-    const imageBuffer = fs.readFileSync(req.file.path);
+    const image = fs.readFileSync(req.file.path, { encoding: 'base64' });
 
 
     // Create a new technician instance
-    const newTechnician = new Technician({from, to, image:imageBuffer, name, email, phone, location, category:existingCategory._id, rating: 0, numServicesDone: 0 });
+    const newTechnician = new Technician({from, to, image:image, name, email, phone, location, category:existingCategory._id, rating: 0, numServicesDone: 0 });
 
     // Save the technician to the database
     const savedTechnician = await newTechnician.save();
@@ -112,13 +112,13 @@ const updateTechnician = async (req, res) => {
   }
 
   // Read the file as binary data
-    const imageBuffer = fs.readFileSync(req.file.path);
+    const image = fs.readFileSync(req.file.path, { encoding: 'base64' });
 
 
     const updatedTechnician = await Technician.findOneAndUpdate(
       {email:email},
       {
-        image:imageBuffer,
+        image:image,
         name,
         email,
         phone,

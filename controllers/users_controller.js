@@ -199,11 +199,11 @@ exports.uploadImage = async (req, res) => {
       return res.status(400).json({ error: 'No image file provided' });
     }
 
-    const imageBuffer = fs.readFileSync(req.file.path);
+    const image = fs.readFileSync(req.file.path, { encoding: 'base64' });
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { image: imageBuffer },
+      { image: image },
       { new: true }
     );
 

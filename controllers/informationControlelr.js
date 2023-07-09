@@ -5,7 +5,7 @@ exports.getAbout = async (req,res) =>{
     let about = await Information.findOne({ name:'about' })
     return res.status(200).send(about.value)
   }catch(error){
-    return res.status(500).send(error)
+    return res.status(500).send('No About Yet')
   }
 }
 
@@ -15,7 +15,7 @@ exports.getTerms = async (req,res) =>{
     let terms = await Information.findOne({ name:'terms' })
     return res.status(200).send(terms.value)
   }catch(error){
-    return res.status(500).send(error)
+    return res.status(500).send('No Terms Yet')
   }
 }
 

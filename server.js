@@ -28,10 +28,12 @@ app.use(bodyParser.json());
 const categoryRouter = require('./routes/categoryRouter')
 const otpRouter = require('./routes/otpRouter')
 const popularTechnician = require('./routes/popularTechnicianRouter')
+const informationsRoute = require('./routes/informationsRouter')
 
 app.use(userRouter,technicianRouter,reservationRoutes,categoryRouter,otpRouter,popularTechnician);
 app.use('/statistics',statisticsRoutes)
 app.use('/managers',managerRoute)
+app.use('/informations',informationsRoute)
 
 const completedReservationRouter = require('./routes/completedReservationRouter');
 

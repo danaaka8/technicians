@@ -148,7 +148,7 @@ exports.getUser = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   try {
     const userId = req.params.id;
-  
+
 
     const deletedUser = await User.findByIdAndDelete(userId);
 
@@ -196,7 +196,6 @@ exports.uploadImage = async (req, res) => {
     const userId = req.params.id;
 
     if (!req.file) {
-      log('here')
       return res.status(400).json({ error: 'No image file provided' });
     }
 
@@ -224,14 +223,14 @@ exports.getAllFavoriteTechnicians = async (req,res) =>{
   const techs = JSON.parse(req.body.techs)
   techsArr = []
 
-  for(let tech in techs){
+  for(let tech of techs){
     try{
       let data = await Technician.findOne({ _id:tech }).populate({
         path:'category',
         ref:'Category'
       });
       techsArr.push(data)
-  
+
     }catch{
       continue
     }

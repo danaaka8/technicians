@@ -1,3 +1,4 @@
+const { sendToClient } = require('../websocket');
 const CompletedReservation = require('../models/completedReservation');
 
 exports.getCompletedReservations = async (req, res) => {
@@ -20,6 +21,11 @@ exports.createCompletedReservation = async (req, res) => {
       category,
       price
     });
+
+    sendToClient(user,JSON.stringify({
+      title:"Zainlak Booking",
+      body:"Your Booking Is Done"
+    }))
 
     return res.status(201).json(completedReservation);
   } catch (error) {

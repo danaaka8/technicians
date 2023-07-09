@@ -20,23 +20,17 @@ const createTechnician = async (req, res) => {
     return res.status(400).json({ error: 'Image file is required' });
   }
 
-  // Read the file as binary data
-  const data = fs.readFileSync(file.path);
-
-  // Encode the file data as base64 string
-  const base64String = data.toString('base64');
-
-  // Delete the temporary file
-  fs.unlinkSync(file.path);
-
     // Check if email already exists
     const existingTechnician = await Technician.findOne({ email: email });
     if (existingTechnician) {
       return res.status(400).json({ error: 'Email already exists' });
     }
 
+    const image = fs.readFileSync(req.file.path, { encoding: 'base64' });
+
+
     // Create a new technician instance
-    const newTechnician = new Technician({from, to, image:base64String, name, email, phone, location, category:existingCategory._id, rating: 0, numServicesDone: 0 });
+    const newTechnician = new Technician({from, to, image:image, name, email, phone, location, category:existingCategory._id, rating: 0, numServicesDone: 0 });
 
     // Save the technician to the database
     const savedTechnician = await newTechnician.save();
@@ -118,18 +112,13 @@ const updateTechnician = async (req, res) => {
   }
 
   // Read the file as binary data
-  const data = fs.readFileSync(file.path);
+    const image = fs.readFileSync(req.file.path, { encoding: 'base64' });
 
-  // Encode the file data as base64 string
-  const base64String = data.toString('base64');
-
-  // Delete the temporary file
-  fs.unlinkSync(file.path);
 
     const updatedTechnician = await Technician.findOneAndUpdate(
       {email:email},
       {
-        image:base64String,
+        image:image,
         name,
         email,
         phone,

@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema({
     default: 'offline'
   },
   image: {
-    type: String,
+    type: Buffer,
     default:null
   },
   location: {

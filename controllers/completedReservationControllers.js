@@ -31,7 +31,7 @@ exports.createCompletedReservation = async (req, res) => {
       url:"https://fcm.googleapis.com/fcm/send",
       headers:{
         'Content-Type':'application/json',
-        'Authorization': "key=AAAAbq2fgnE:APA91bG7AnjHTe-bZhlLGQS1XZyepocG_P20NRwLHDbW9YHdlUWQqNRvaDQWHosVLDvYT4zA-L5y3EPozJc_CYaeiGoAptA_M3x68q8nIrg-1NgvAnRqr0Y4T9V-9YZbNOsl42gshP5p"
+        'Authorization': "key=AAAAEKeP2q0:APA91bGZ4JHp8ZRAICOomqQXTJHnYskPiAAXYC8kzUGwxRVlUM2ZKm-Dh_PkTUmV90gjj-eq-IbILDNgex59_vx-15QfspQtzAXwk_q4naK-nhcHMT9wwYipisGc3PpdxM7Oxfo1zets"
       },
       data:{
         notification:{
@@ -49,7 +49,12 @@ exports.createCompletedReservation = async (req, res) => {
       date:Date.now()
     })
 
-    return res.status(201).json(completedReservation);
+
+    // await User.findOneAndUpdate({ _id: user},{
+    //   notifications:notifications
+    // },{ $new:true })
+    //
+    // return res.status(201).json(completedReservation);
   } catch (error) {
     return res.status(500).json({ error: 'Internal server error' });
   }

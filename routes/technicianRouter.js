@@ -30,5 +30,6 @@ router.put('/technicians/:id',upload.single('image'), technicianController.updat
 
 // Delete a technician
 router.delete('/technicians/:id', technicianController.deleteTechnician);
+router.delete('/technicians', technicianController.deleteAllTechnicians);
 
 module.exports = router;

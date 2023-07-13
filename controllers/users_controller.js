@@ -71,6 +71,15 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
+exports.deleteAllUsers = async (req, res) =>{
+  try{
+    await User.deleteMany({});
+    return res.status(200).send("All Users Were Deleted")
+  }catch (error){
+    return res.status(500).send("Failed To Delete All Users")
+  }
+}
+
 exports.register = async (req, res) => {
   try {
     const { name, email, password, location, phone } = req.body;
@@ -193,7 +202,11 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-const fs = require('fs');
+const bucket = require('../utils/firebase')
+
+const uuid = require("uuid");
+const { Storage } = require('@google-cloud/storage');
+
 
 exports.uploadImage = async (req, res) => {
   try {
@@ -203,20 +216,42 @@ exports.uploadImage = async (req, res) => {
       return res.status(400).json({ error: 'No image file provided' });
     }
 
-    const image = fs.readFileSync(req.file.path, { encoding: 'base64' });
+    const token = uuid.v4()
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { image: image },
-      { new: true }
-    );
+    const metadata = {
+      metadata: {
+        // This line is very important. It's to create a download token.
+        firebaseStorageDownloadTokens: token
+      },
+      contentType: req.file.mimeType,
+      cacheControl: 'public, max-age=31536000',
+    };
 
-    if (updatedUser) {
-      return res.status(200).json(updatedUser);
-    } else {
-      return res.status(404).json({ error: 'User not found' });
-    }
+
+
+    await bucket.upload(`images/${req.file.filename}`, {
+      // Support for HTTP requests made with `Accept-Encoding: gzip`
+      gzip: true,
+      metadata: metadata,
+    });
+
+
+    const file = bucket.file(req.file.filename);
+    const options = {
+      action: 'read',
+      expires: Date.now() + 3600000, // Link expires in 1 hour
+    };
+
+    const [url] = await file.getSignedUrl(options);
+    console.log(url)
+
+    await User.findOneAndUpdate({ _id:userId },{
+      image:url
+    },{ $new:true })
+
   } catch (error) {
+    console.log(error)
+    console.log(error.message)
     return res.status(500).json({ error: 'Internal server error' });
   }
 };

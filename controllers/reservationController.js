@@ -9,9 +9,8 @@ exports.createReservation = async (req, res) => {
     // Check if the time slot is available
     const existingReservation = await Reservation.findOne({ technicianId, date,time });
     if (existingReservation) {
-      return res.status(409).json({ error: 'Time slot already taken' });
+      return res.status(409).send('Sorry This Technician Is Reserved')
     }
-
     const reservation = new Reservation({
       userId,
       technicianId,
@@ -19,11 +18,11 @@ exports.createReservation = async (req, res) => {
       time
     });
 
-    const savedReservation = await reservation.save();
+    await reservation.save();
 
-    return res.status(201).json(savedReservation);
+    return res.status(201).send("Your Booking Was Created");
   } catch (error) {
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).send('Internal server error');
   }
 };
 

@@ -1,11 +1,23 @@
 const mongoose = require('mongoose');
 
 const popularTechnicianSchema = new mongoose.Schema({
-  technicianId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Technician',
-    required: true
-  }
+  image:{
+    type:String,
+    required:true
+  },
+  name:{
+    type:String,
+    required:true,
+    unique:true
+  },
+  description:{
+    type:String,
+    required:true
+  },
+  price:{
+    type: String,
+    required:true
+  },
 });
 
 const PopularTechnician = mongoose.model('PopularTechnician', popularTechnicianSchema);

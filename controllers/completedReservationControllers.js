@@ -52,9 +52,9 @@ exports.createCompletedReservation = async (req, res) => {
     })
 
 
-    // await User.findOneAndUpdate({ _id: user},{
-    //   notifications:notifications
-    // },{ $new:true })
+    await User.findOneAndUpdate({ _id: user},{
+      notifications:notifications
+    },{ $new:true })
     //
     // return res.status(201).json(completedReservation);
   } catch (error) {

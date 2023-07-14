@@ -14,6 +14,10 @@ const popularTechnicianSchema = new mongoose.Schema({
     type:String,
     required:true
   },
+  link:{
+    type:String,
+    default:''
+  },
   price:{
     type: String,
     required:true

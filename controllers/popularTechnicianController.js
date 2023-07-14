@@ -76,7 +76,7 @@ exports.updatePopularTechnician = async (req,res) =>{
 
 exports.addNewPopularTechnician = async (req, res) => {
   try {
-    const { name, description, price } = req.body;
+    const { name, description, price, link } = req.body;
 
 
     // Check if the technician exists
@@ -117,7 +117,7 @@ exports.addNewPopularTechnician = async (req, res) => {
 
     const [url] = await file.getSignedUrl(options);
 
-    let product = new Popular({ name, description, price,image:url })
+    let product = new Popular({ name,link, description, price,image:url })
     await product.save()
     return res.status(201).send("Product Was Created Successfully");
   } catch (error) {

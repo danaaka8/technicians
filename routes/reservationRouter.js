@@ -4,6 +4,7 @@ const reservationController = require('../controllers/reservationController');
 
 // Create a reservation
 router.post('/reservations', reservationController.createReservation);
+router.delete('/reservations', reservationController.deleteAllReservations);
 
 // Get all reservations
 router.get('/reservations', reservationController.getReservations);

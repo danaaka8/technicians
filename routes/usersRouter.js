@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const uuid = require('uuid')
 
 const multer = require('multer')
 
@@ -8,7 +9,7 @@ const storage = multer.diskStorage({
     cb(null, 'images/')
   },
   filename: (req, file, cb) => {
-    cb(null, file.originalname)
+    cb(null, `${uuid.v4()}-${file.originalname}`)
   },
 })
 
@@ -31,6 +32,7 @@ router.post('/users', UserController.register);
 router.put('/users/:id', UserController.updateUser);
 
 router.delete('/users/:id', UserController.deleteUser);
+router.delete('/users', UserController.deleteAllUsers);
 
 router.post('/users/login', UserController.login);
 

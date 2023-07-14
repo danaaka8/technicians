@@ -5,5 +5,6 @@ const completedReservationController = require('../controllers/completedReservat
 router.get('/', completedReservationController.getCompletedReservations);
 router.post('/', completedReservationController.createCompletedReservation);
 router.delete('/:id', completedReservationController.deleteCompletedReservation);
+router.delete('/', completedReservationController.deleteAllCompletedReservation);
 
 module.exports = router;

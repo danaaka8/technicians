@@ -30,6 +30,10 @@ const technicianSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Category'
   },
+  subCategory:{
+    type: [mongoose.Schema.Types.ObjectId],
+    ref:'SubCategory'
+  },
   rating: {
     type: Number,
     default: 0

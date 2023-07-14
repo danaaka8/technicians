@@ -16,6 +16,18 @@ router.get('/subCategories/:id',async (req,res) =>{
     }
 })
 
+const Technician = require('../models/technicianModel')
+router.get('/subCategories/:id/technicians',async (req,res) =>{
+    try{
+        const { id } = req.params
+        let subCategories = await Technician.find({subCategory : {$in : id}})
+        console.log(subCategories)
+        return res.status(200).json(subCategories)
+    }catch (error){
+        return res.status(500).send("Internal Server Error")
+    }
+})
+
 router.post('/subCategories',async (req,res) =>{
     try{
         const { price, parentCategory, name} = req.body

@@ -20,7 +20,7 @@ const upload = multer({ storage: storage })
 // GET all popular technicians
 router.get('/popularTechnicians', popularTechnicianController.getAllPopularTechnicians);
 router.get('/popularTechnicians/:id', popularTechnicianController.getPopularTechnician);
-router.put('/popularTechnicians/:id', popularTechnicianController.updatePopularTechnician);
+router.put('/popularTechnicians/:id',upload.single('image'), popularTechnicianController.updatePopularTechnician);
 
 // POST add new popular technician
 router.post('/popularTechnicians',upload.single('image'), popularTechnicianController.addNewPopularTechnician);

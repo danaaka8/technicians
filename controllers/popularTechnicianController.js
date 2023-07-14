@@ -29,6 +29,42 @@ exports.updatePopularTechnician = async (req,res) =>{
   try{
     const { name, description, price } = req.body
     const { id } = req.params
+
+    if(req.file){
+      const token = uuid.v4()
+
+      const metadata = {
+        metadata: {
+          // This line is very important. It's to create a download token.
+          firebaseStorageDownloadTokens: token
+        },
+        contentType: req.file.mimeType,
+        cacheControl: 'public, max-age=31536000',
+      };
+
+
+
+      await bucket.upload(`images/${req.file.filename}`, {
+        // Support for HTTP requests made with `Accept-Encoding: gzip`
+        gzip: true,
+        metadata: metadata,
+      });
+
+
+      const file = bucket.file(req.file.filename);
+      const options = {
+        action: 'read',
+        expires: Date.now() + 3600000, // Link expires in 1 hour
+      };
+
+      const [url] = await file.getSignedUrl(options);
+
+      await Popular.findOneAndUpdate({_id:id},{
+        name,description,price,
+        image:url
+      },{ $new: true })
+      return res.status(200).send("Product Is Updated")
+    }
     await Popular.findOneAndUpdate({_id:id},{
       name,description,price
     },{ $new: true })

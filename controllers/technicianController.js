@@ -7,7 +7,7 @@ const Category = require('../models/categoryModel')
 // Create a new technician
 const createTechnician = async (req, res) => {
   try {
-    const { name, email, phone, location, category, from, to, price } = req.body;
+    const { name, email, phone, location, category,subCategory, from, to, price } = req.body;
     console.log(req.body);
 
     const existingCategory = await Category.findById(category);
@@ -57,7 +57,7 @@ const createTechnician = async (req, res) => {
 
 
     // Create a new technician instance
-    const newTechnician = new Technician({from, to, price,image:url, name, email, phone, location, category:existingCategory._id, rating: 0, numServicesDone: 0 });
+    const newTechnician = new Technician({from, to,subCategory, price,image:url, name, email, phone, location, category:existingCategory._id, rating: 0, numServicesDone: 0 });
 
     // Save the technician to the database
     const savedTechnician = await newTechnician.save();
@@ -79,7 +79,11 @@ const getAllTechnicians = async (req, res) => {
     if (categoryId) {
       technicians = await Technician.find({}).populate({
         path:'category',
-        ref:'Category'
+        ref:'Category',
+        populate:{
+          path:'subCategory',
+          ref:'SubCategory'
+        }
       });
 
 
@@ -175,6 +179,7 @@ const updateTechnician = async (req, res) => {
 
     const [url] = await file.getSignedUrl(options);
     urlImage = url;
+    console.log(url)
   }else{
     urlImage = existingTechnician.image
   }
@@ -205,6 +210,7 @@ const updateTechnician = async (req, res) => {
 
     res.status(200).send("Technician Was Updated");
   } catch (error) {
+    console.log(error.message)
     res.status(500).send("Server Error");
   }
 };

@@ -55,14 +55,15 @@ exports.getUserReservations = async (req, res) => {
         const populatedReservation = await reservation.populate({
           path: 'technicianId',
           ref: 'Technician',
-          populate: {
-            path: 'category',
-            ref: 'Category'
-          }
+          populate: [
+            { path: 'category', ref: 'Category' },
+            { path: 'subCategory', ref: 'SubCategory' }
+          ]
         })
 
         reservations.push(populatedReservation);
       } catch (error) {
+        console.log(error.message)
         continue
       }
     }

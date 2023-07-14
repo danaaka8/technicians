@@ -13,6 +13,31 @@ exports.getAllPopularTechnicians = async (req, res) => {
   }
 };
 
+exports.getPopularTechnician = async (req,res) =>{
+  try{
+    const { id } = req.params
+    console.log(id)
+    let popular = await Popular.findOne({ _id: id })
+    return res.status(200).json(popular)
+  }catch (error){
+    console.log(error.message)
+    return  res.status(500).json({})
+  }
+}
+
+exports.updatePopularTechnician = async (req,res) =>{
+  try{
+    const { name, description, price } = req.body
+    const { id } = req.params
+    await Popular.findOneAndUpdate({_id:id},{
+      name,description,price
+    },{ $new: true })
+    return res.status(200).send("Product Is Updated")
+  }catch (error){
+    return  res.status(500).send("Error Updating The Product, Internal Server Error")
+  }
+}
+
 exports.addNewPopularTechnician = async (req, res) => {
   try {
     const { name, description, price } = req.body;
@@ -68,17 +93,18 @@ exports.deletePopularTechnician = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Check if the technician exists
-    const technician = await Technician.findById(id);
-    if (!technician) {
-      return res.status(404).json({ error: 'Technician not found' });
-    }
-
-    technician.popular = false;
-    const savedTechnician = await technician.save();
-
-    return res.status(200).json(savedTechnician);
+    await Popular.deleteOne(({ _id: id }))
+    return res.status(200).send("Product Was Deleted");
   } catch (error) {
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).send('Internal server error');
+  }
+};
+
+exports.deleteAllPopularTechnician = async (req, res) => {
+  try {
+    await Popular.deleteMany({})
+    return res.status(200).send("All Products Were Deleted");
+  } catch (error) {
+    return res.status(500).send('Internal server error, Failed To Delete All Products');
   }
 };

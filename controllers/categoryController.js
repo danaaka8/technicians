@@ -1,5 +1,6 @@
 const Category = require('../models/categoryModel');
-const fs = require('fs');
+const uuid = require("uuid");
+const bucket = require("../utils/firebase");
 exports.getAllCategories = async (req, res) => {
   try {
     const categories = await Category.find({}, { __v: false });
@@ -20,12 +21,38 @@ exports.createCategory = async (req, res) => {
         console.log('errored');
         return res.status(400).json({ error: 'No image file provided' });
       }
-  
-      const enc_image = fs.readFileSync(req.file.path, { encoding: 'base64' });
-        
+
+    const token = uuid.v4()
+
+    const metadata = {
+      metadata: {
+        // This line is very important. It's to create a download token.
+        firebaseStorageDownloadTokens: token
+      },
+      contentType: req.file.mimeType,
+      cacheControl: 'public, max-age=31536000',
+    };
+
+
+
+    await bucket.upload(`images/${req.file.filename}`, {
+      // Support for HTTP requests made with `Accept-Encoding: gzip`
+      gzip: true,
+      metadata: metadata,
+    });
+
+
+    const file = bucket.file(req.file.filename);
+    const options = {
+      action: 'read',
+      expires: Date.now() + 3600000, // Link expires in 1 hour
+    };
+
+    const [url] = await file.getSignedUrl(options);
+
     const category = new Category({
       name: name,
-      image: enc_image
+      image: url
     });
 
     const savedCategory = await category.save();
@@ -74,6 +101,7 @@ exports.updateCategory = async (req, res) => {
   }
 };
 
+const SubCategory = require('../models/subCategories')
 exports.deleteCategory = async (req, res) => {
   try {
     const categoryId = req.params.id;
@@ -81,6 +109,7 @@ exports.deleteCategory = async (req, res) => {
     const deletedCategory = await Category.findByIdAndDelete(categoryId);
 
     if (deletedCategory) {
+      await SubCategory.deleteMany({ parentCategory: categoryId })
       return res.status(200).json({ message: 'Category deleted successfully' });
     } else {
       return res.status(404).json({ error: 'Category not found' });

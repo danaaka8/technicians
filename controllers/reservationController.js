@@ -88,3 +88,12 @@ exports.deleteReservation = async (req, res) => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+exports.deleteAllReservations = async (req,res) =>{
+  try{
+    await Reservation.deleteMany({})
+    return res.status(200).send("All Reservations Were Deleted")
+  }catch (error){
+    return res.status(500).send("Failed To Delete Reservations")
+  }
+}

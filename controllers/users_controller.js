@@ -245,13 +245,13 @@ exports.uploadImage = async (req, res) => {
     const [url] = await file.getSignedUrl(options);
     console.log(url)
 
-    await User.findOneAndUpdate({ _id:userId },{
+    let updated = await User.findOneAndUpdate({ _id:userId },{
       image:url
     },{ $new:true })
 
+    return res.status(200).json(updated)
+
   } catch (error) {
-    console.log(error)
-    console.log(error.message)
     return res.status(500).json({ error: 'Internal server error' });
   }
 };

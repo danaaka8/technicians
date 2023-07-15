@@ -4,9 +4,9 @@ const serviceAccount = require('./serviceAccountKey.json');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket:'techs-5d753.appspot.com'
+  storageBucket:'zainfinal-b9de0.appspot.com'
 });
 
-const bucket = admin.storage().bucket('techs-5d753.appspot.com');
+const bucket = admin.storage().bucket('zainfinal-b9de0.appspot.com');
 
 module.exports = bucket

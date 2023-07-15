@@ -26,18 +26,16 @@ const createTechnician = async (req, res) => {
     }
 
 
-    const token = uuid.v4()
+    const token = uuid.v4();
 
     const metadata = {
       metadata: {
         // This line is very important. It's to create a download token.
-        firebaseStorageDownloadTokens: token
+        firebaseStorageDownloadTokens: token,
       },
       contentType: req.file.mimeType,
-      cacheControl: 'public, max-age=31536000',
+      cacheControl: 'public, max-age=315360000000',
     };
-
-
 
     await bucket.upload(`images/${req.file.filename}`, {
       // Support for HTTP requests made with `Accept-Encoding: gzip`
@@ -45,15 +43,8 @@ const createTechnician = async (req, res) => {
       metadata: metadata,
     });
 
+    const url = `https://firebasestorage.googleapis.com/v0/b/zainfinal-b9de0.appspot.com/o/${req.file.filename}?alt=media&token=${token}5`
 
-    const file = bucket.file(req.file.filename);
-    const options = {
-      action: 'read',
-      expires: Date.now() + 3600000, // Link expires in 1 hour
-    };
-
-    const [url] = await file.getSignedUrl(options);
-    console.log(url)
 
 
     // Create a new technician instance
@@ -151,18 +142,16 @@ const updateTechnician = async (req, res) => {
 
 
   if (file) {
-    const token = uuid.v4()
+    const token = uuid.v4();
 
     const metadata = {
       metadata: {
         // This line is very important. It's to create a download token.
-        firebaseStorageDownloadTokens: token
+        firebaseStorageDownloadTokens: token,
       },
       contentType: req.file.mimeType,
-      cacheControl: 'public, max-age=31536000',
+      cacheControl: 'public, max-age=315360000000',
     };
-
-
 
     await bucket.upload(`images/${req.file.filename}`, {
       // Support for HTTP requests made with `Accept-Encoding: gzip`
@@ -170,14 +159,8 @@ const updateTechnician = async (req, res) => {
       metadata: metadata,
     });
 
+    const url = `https://firebasestorage.googleapis.com/v0/b/zainfinal-b9de0.appspot.com/o/${req.file.filename}?alt=media&token=${token}5`
 
-    const file = bucket.file(req.file.filename);
-    const options = {
-      action: 'read',
-      expires: Date.now() + 3600000, // Link expires in 1 hour
-    };
-
-    const [url] = await file.getSignedUrl(options);
     urlImage = url;
     console.log(url)
   }else{

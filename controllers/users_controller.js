@@ -133,7 +133,7 @@ exports.login = async (req, res) => {
         deviceToken:token
       },{$new:true})
 
-      return res.status(200).json({ token: token, usterser: user });
+      return res.status(200).json({ token: token, user: user });
     } else {
       return res.status(401).json({ error: 'Invalid password' });
     }

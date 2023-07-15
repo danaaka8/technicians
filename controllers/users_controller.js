@@ -104,7 +104,7 @@ exports.register = async (req, res) => {
 
 
 
-    return res.status(200).json({ user: savedUser });
+    return res.status(200).json(savedUser);
   } catch (error) {
     return res.status(500).json({ error: 'Internal server error' });
   }

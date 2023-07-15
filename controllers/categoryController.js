@@ -30,7 +30,7 @@ exports.createCategory = async (req, res) => {
         firebaseStorageDownloadTokens: token
       },
       contentType: req.file.mimeType,
-      cacheControl: 'public, max-age=31536000',
+      cacheControl: 'public, max-age=31536000000',
     };
 
 

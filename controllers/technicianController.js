@@ -34,7 +34,7 @@ const createTechnician = async (req, res) => {
         firebaseStorageDownloadTokens: token
       },
       contentType: req.file.mimeType,
-      cacheControl: 'public, max-age=31536000',
+      cacheControl: 'public, max-age=31536000000',
     };
 
 
@@ -159,7 +159,7 @@ const updateTechnician = async (req, res) => {
         firebaseStorageDownloadTokens: token
       },
       contentType: req.file.mimeType,
-      cacheControl: 'public, max-age=31536000',
+      cacheControl: 'public, max-age=31536000000',
     };
 
 

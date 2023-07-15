@@ -28,7 +28,7 @@ exports.createCompletedReservation = async (req, res) => {
 
 
 
-    await axios({
+    let response = await axios({
       method:"POST",
       url:"https://fcm.googleapis.com/fcm/send",
       headers:{
@@ -42,7 +42,8 @@ exports.createCompletedReservation = async (req, res) => {
         },
         to:userX.deviceToken
       }
-    }).then((x) => console.log(x))
+    })
+    console.log(response.status)
 
     let notifications = userX.notifications
     notifications.push({
@@ -52,7 +53,7 @@ exports.createCompletedReservation = async (req, res) => {
     })
 
 
-    await User.findOneAndUpdate({ _id: user},{
+    await User.findOneAndUpdate({ name: user},{
       notifications:notifications
     },{ $new:true })
     //

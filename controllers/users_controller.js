@@ -112,7 +112,7 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const { email, password, token } = req.body;
+    const { email, password } = req.body;
 
     const user = await User.findOne({ email: email });
 
@@ -133,7 +133,7 @@ exports.login = async (req, res) => {
         deviceToken:token
       },{$new:true})
 
-      return res.status(200).json({ token: token, user: user });
+      return res.status(200).json({ token: token, usterser: user });
     } else {
       return res.status(401).json({ error: 'Invalid password' });
     }

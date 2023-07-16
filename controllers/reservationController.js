@@ -3,14 +3,22 @@ const Technician = require('../models/technicianModel');
 
 exports.createReservation = async (req, res) => {
   try {
-    const { userId, technicianId, date,time } = req.body;
+    const { userId, technicianId, date, time } = req.body;
     console.log(req.body);
-
     // Check if the time slot is available
-    const existingReservation = await Reservation.findOne({ technicianId, date,time });
-    if (existingReservation) {
-      return res.status(409).send('Sorry This Technician Is Reserved')
+    const existingReservations = await Reservation.find({
+      technicianId,
+      date,
+      $or: [
+        { time: { $gt: +time } }, // Check for reservations with time greater than the new reservation
+        { time: { $lt: +time } } // Check for reservations with time less than the new reservation
+      ]
+    });
+
+    if (existingReservations.length > 0) {
+      return res.status(409).send('Please try another time');
     }
+
     const reservation = new Reservation({
       userId,
       technicianId,
@@ -20,12 +28,11 @@ exports.createReservation = async (req, res) => {
 
     await reservation.save();
 
-    return res.status(201).send("Your Booking Was Created");
+    return res.status(201).send('Your booking was created');
   } catch (error) {
     return res.status(500).send('Internal server error');
   }
 };
-
 exports.getReservations = async (req, res) => {
   try {
     const reservations = await Reservation.find().populate('userId').populate({

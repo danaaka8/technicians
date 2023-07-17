@@ -9,7 +9,7 @@ exports.login = async (req,res) =>{
         const manager = await Manager.findOne({ email:email,password:password })
     
         if(!manager){
-            return res.status(400)
+            return res.status(400).send("Invalid Email or Password")
         }
 
         const token = jwt.sign({
@@ -17,8 +17,7 @@ exports.login = async (req,res) =>{
             role:manager.role,
             id:manager._id
         },'ManagerLoginKey',{ expiresIn:'30d' })
-
-        res.status(200).json({
+       return res.status(200).json({
             token:token,
             user:{
                 email:email,
@@ -28,7 +27,8 @@ exports.login = async (req,res) =>{
 
 
     }catch(error){
-
+        console.log(error.message)
+        return  res.status(500).send("Internal Server Error")
     }
 }
 

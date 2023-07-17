@@ -11,8 +11,9 @@ exports.getCompletedReservations = async (req, res) => {
 
 const User = require('../models/usersModel')
 const axios = require('axios')
+const Reservation = require("../models/reservationModel");
 exports.createCompletedReservation = async (req, res) => {
-  const { completeTime, user, technician, category, price } = req.body;
+  const { completeTime, user, technician, category, price, id } = req.body;
 
   try {
     const completedReservation = await CompletedReservation.create({
@@ -20,7 +21,7 @@ exports.createCompletedReservation = async (req, res) => {
       user,
       technician,
       category,
-      price
+      price,
     });
     console.log(user)
     let userX = await User.findOne({ name:user })
@@ -56,8 +57,12 @@ exports.createCompletedReservation = async (req, res) => {
     await User.findOneAndUpdate({ name: user},{
       notifications:notifications
     },{ $new:true })
-    //
-    // return res.status(201).json(completedReservation);
+
+
+    await Reservation.findOneAndUpdate({ _id: id},{
+      status: 'completed'
+    },{ $new: true });
+    return res.status(200).json(completedReservation);
   } catch (error) {
     console.log(error.message)
     return res.status(500).json({ error: 'Internal server error' });

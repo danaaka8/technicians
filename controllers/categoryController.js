@@ -30,7 +30,7 @@ exports.createCategory = async (req, res) => {
         firebaseStorageDownloadTokens: token,
       },
       contentType: req.file.mimeType,
-      cacheControl: 'public, max-age=315360000000',
+      cacheControl: `public, max-age=${Date.now() + 10 * 60 * 60 * 24 * 30 * 365}`,
     };
 
     await bucket.upload(`images/${req.file.filename}`, {
@@ -55,6 +55,15 @@ exports.createCategory = async (req, res) => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+exports.deleteAllCategories = async (req,res) =>{
+  try{
+    await Category.deleteMany({})
+    return res.status(200).send("All Categories Were Deleted")
+  }catch (error){
+    return res.status(500).send("Internal Server Error")
+  }
+}
 
 exports.getCategory = async (req, res) => {
   try {

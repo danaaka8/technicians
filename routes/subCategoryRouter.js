@@ -63,8 +63,17 @@ router.post('/subCategories',async (req,res) =>{
 
 router.delete('/subCategories/:id', async (req,res) =>{
     try{
-        await SubCategory.deleteOne({ _id:req.parama.id })
+        await SubCategory.deleteOne({ _id:req.params.id })
         return res.status(200).send("SubCategory Was Deleted")
+    }catch (error){
+        return res.status(500).send("Internal Server Error")
+    }
+})
+
+router.delete('/subCategories/parentCategory/:id', async (req,res) =>{
+    try{
+        await SubCategory.deleteMany({ parentCategory:req.params.id })
+        return res.status(200).send("SubCategories Were Deleted")
     }catch (error){
         return res.status(500).send("Internal Server Error")
     }
@@ -73,9 +82,11 @@ router.delete('/subCategories/:id', async (req,res) =>{
 router.put('/subCategories/:id', async (req,res) =>{
     try{
         const { name, price, parentCategory } = req.body
+        console.log(req.body)
+        console.log(req.params.id)
         let isExisting = await SubCategory.find({ name })
-        if(isExisting){
-            return res.status(500).send("SubCategory Already Exists")
+        if(!isExisting){
+            return res.status(404).send("SubCategory Doesn't Exist")
         }
 
         await SubCategory.findOneAndUpdate({ _id: req.params.id },{

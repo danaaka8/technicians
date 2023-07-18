@@ -112,7 +112,7 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, deviceToken } = req.body;
 
     const user = await User.findOne({ email: email });
 
@@ -126,11 +126,11 @@ exports.login = async (req, res) => {
       const token = jwt.sign(
         { userId: user._id, email: user.email, role: 'user' },
         'your-secret-key',
-        { expiresIn: '24h' }
+        { expiresIn: '30d' }
       );
 
       await User.findOneAndUpdate({ email:email },{
-        deviceToken:token
+        deviceToken:deviceToken
       },{$new:true})
 
       return res.status(200).json({ token: token, user: user });
@@ -141,6 +141,20 @@ exports.login = async (req, res) => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+exports.getUserNotifications = async (req,res) => {
+  try{
+    const { token } = req.headers
+    let decodedToken = await jwt.verify(token,'your-secret-key');
+
+    let user = await User.findOne({ _id: decodedToken.userId })
+
+
+    return res.status(200).json(user.notifications)
+  }catch (error){
+    return res.sendStatus(500)
+  }
+}
 
 exports.getUser = async (req, res) => {
   try {
@@ -250,23 +264,39 @@ exports.uploadImage = async (req, res) => {
 const Technician = require('../models/technicianModel')
 
 exports.getAllFavoriteTechnicians = async (req,res) =>{
-  const techs = JSON.parse(req.body.techs)
-  techsArr = []
+  console.log('am here')
+  try{
+    const { token } = req.headers
+    let decodedToken = await jwt.verify(token,'your-secret-key');
 
-  for(let tech of techs){
-    try{
-      let data = await Technician.findOne({ _id:tech }).populate({
-        path:'category',
-        ref:'Category'
-      });
-      techsArr.push(data)
+    let user = await User.findOne({ _id: decodedToken.userId })
 
-    }catch{
-      continue
+    console.log(token)
+    console.log(decodedToken)
+    let techs = user.favorites
+    console.log(techs)
+
+    let techsArr = []
+
+
+    for(let tech of techs){
+      try{
+        let data = await Technician.findOne({ _id:tech }).populate({
+          path:'category',
+          ref:'Category'
+        });
+        techsArr.push(data)
+
+      }catch(error){
+
+      }
     }
-  }
 
-  return res.status(200).json(techsArr)
+    return res.status(200).json(techsArr)
+  }catch (error){
+    console.log(error.message)
+    return res.status(500).send("Internal Server Error")
+  }
 }
 
 

@@ -4,9 +4,19 @@ const Technician = require('../models/technicianModel');
 exports.createReservation = async (req, res) => {
   try {
     const { userId, technicianId, date, time } = req.body;
-    console.log(req.body);
-    // Check if the time slot is available
-    const existingReservations = await Reservation.find({
+
+    const existingSameReservation = await Reservation.findOne({
+      technicianId,
+      userId,
+      date,
+      time
+    })
+
+    if(existingSameReservation){
+      return res.status(400).send("You Already Have This Booking")
+    }
+
+    const existingDelayedReservations = await Reservation.find({
       technicianId,
       date,
       $or: [
@@ -15,7 +25,7 @@ exports.createReservation = async (req, res) => {
       ]
     });
 
-    if (existingReservations.length > 0) {
+    if (existingDelayedReservations.length > 0) {
       return res.status(409).send('Please try another time');
     }
 

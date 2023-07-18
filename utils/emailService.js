@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
 
 exports.sendResetPasswordEmail = (email, otp) => {
   const mailOptions = {
-    from: 'aloshhasso99944@gmail.com',
+    from: 'admin@zainlak.com',
     to: email,
     subject: 'Reset Password',
     text: `Your OTP for password reset is: ${otp}`

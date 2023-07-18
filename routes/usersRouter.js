@@ -28,6 +28,7 @@ router.put('/users/:id/uploadImage', upload.single('image'),UserController.uploa
 router.get('/users/:id', UserController.getUser);
 
 router.post('/users', UserController.register);
+router.get('/users/user/notifications', UserController.getUserNotifications)
 
 router.put('/users/:id', UserController.updateUser);
 
@@ -36,7 +37,7 @@ router.delete('/users', UserController.deleteAllUsers);
 
 router.post('/users/login', UserController.login);
 
-router.post('/users/favorites',UserController.getAllFavoriteTechnicians)
+router.get('/users/user/favorites',UserController.getAllFavoriteTechnicians)
 router.delete('/users/favorites/:id',UserController.deleteFavoriteTech)
 router.post('/users/favorites/create',UserController.createFavoriteTech)
 

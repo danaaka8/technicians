@@ -27,7 +27,7 @@ exports.getPopularTechnician = async (req,res) =>{
 
 exports.updatePopularTechnician = async (req,res) =>{
   try{
-    const { name, description, price } = req.body
+    const { name, description, price, link } = req.body
     const { id } = req.params
 
     if(req.file){
@@ -53,8 +53,8 @@ exports.updatePopularTechnician = async (req,res) =>{
 
 
       await Popular.findOneAndUpdate({_id:id},{
-        name,description,price,
-        image:url
+        name,description,price,link,
+        image:url,
       },{ $new: true })
       return res.status(200).send("Product Is Updated")
     }
@@ -82,18 +82,16 @@ exports.addNewPopularTechnician = async (req, res) => {
       return  res.status(400).send("Failed To Add Product, Please Provide An Image")
     }
 
-    const token = uuid.v4()
+    const token = uuid.v4();
 
     const metadata = {
       metadata: {
         // This line is very important. It's to create a download token.
-        firebaseStorageDownloadTokens: token
+        firebaseStorageDownloadTokens: token,
       },
       contentType: req.file.mimeType,
       cacheControl: `public, max-age=${Date.now() + 10 * 60 * 60 * 24 * 30 * 365}`,
     };
-
-
 
     await bucket.upload(`images/${req.file.filename}`, {
       // Support for HTTP requests made with `Accept-Encoding: gzip`
@@ -101,14 +99,8 @@ exports.addNewPopularTechnician = async (req, res) => {
       metadata: metadata,
     });
 
+    const url = `https://firebasestorage.googleapis.com/v0/b/zainfinal-b9de0.appspot.com/o/${req.file.filename}?alt=media&token=${token}5`
 
-    const file = bucket.file(req.file.filename);
-    const options = {
-      action: 'read',
-      expires: Date.now() + 3600000, // Link expires in 1 hour
-    };
-
-    const [url] = await file.getSignedUrl(options);
 
     let product = new Popular({ name,link, description, price,image:url })
     await product.save()

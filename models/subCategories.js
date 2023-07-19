@@ -6,6 +6,11 @@ const SubCategorySchema = new mongoose.Schema({
         required: true,
         unique:true
     },
+    nameAr:{
+      type: String,
+      required: String,
+      unique:true
+    },
     price:{
         type:String,
         default:null

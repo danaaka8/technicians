@@ -38,6 +38,8 @@ router.delete('/users', UserController.deleteAllUsers);
 router.post('/users/login', UserController.login);
 
 router.get('/users/user/favorites',UserController.getAllFavoriteTechnicians)
+
+router.get('/users/user/favorites/isFavorite', UserController.isFavoriteTechnician)
 router.delete('/users/favorites/:id',UserController.deleteFavoriteTech)
 router.post('/users/favorites/create',UserController.createFavoriteTech)
 

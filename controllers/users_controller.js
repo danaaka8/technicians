@@ -264,17 +264,12 @@ exports.uploadImage = async (req, res) => {
 const Technician = require('../models/technicianModel')
 
 exports.getAllFavoriteTechnicians = async (req,res) =>{
-  console.log('am here')
   try{
     const { token } = req.headers
     let decodedToken = await jwt.verify(token,'your-secret-key');
-
     let user = await User.findOne({ _id: decodedToken.userId })
 
-    console.log(token)
-    console.log(decodedToken)
     let techs = user.favorites
-    console.log(techs)
 
     let techsArr = []
 
@@ -338,4 +333,21 @@ exports.deleteFavoriteTech = async (req,res) =>{
   }
 
 
+}
+
+exports.isFavoriteTechnician = async (req,res) =>{
+  try{
+    const { token, technicianid } = req.headers
+    console.log(req.headers)
+    let decodedToken = await jwt.verify(token,'your-secret-key');
+    let user = await User.findOne({ _id: decodedToken.userId })
+    console.log(technicianid)
+    if(user.favorites.some((e) => e == technicianid)){
+      return res.status(200).send(true)
+    }else{
+      return res.status(404).send(false)
+    }
+  }catch (error){
+
+  }
 }

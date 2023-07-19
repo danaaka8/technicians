@@ -28,8 +28,9 @@ const otpRouter = require('./routes/otpRouter')
 const popularTechnician = require('./routes/popularTechnicianRouter')
 const informationsRoute = require('./routes/informationsRouter')
 const subCategoriesRouter = require('./routes/subCategoryRouter')
+const NotificationRouter = require('./routes/notificationRouter')
 
-app.use(userRouter,technicianRouter,reservationRoutes,categoryRouter,otpRouter,popularTechnician,subCategoriesRouter);
+app.use(userRouter,technicianRouter,reservationRoutes,categoryRouter,NotificationRouter,otpRouter,popularTechnician,subCategoriesRouter);
 app.use('/statistics',statisticsRoutes)
 app.use('/managers',managerRoute)
 app.use('/informations',informationsRoute)

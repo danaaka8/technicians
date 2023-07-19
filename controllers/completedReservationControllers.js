@@ -12,10 +12,17 @@ exports.getCompletedReservations = async (req, res) => {
 const User = require('../models/usersModel')
 const axios = require('axios')
 const Reservation = require("../models/reservationModel");
+const NotificationModel = require('../models/notifications')
+
 exports.createCompletedReservation = async (req, res) => {
   const { completeTime, user, technician, category, price, id } = req.body;
 
   try {
+    let isAlreadyCompleted = await Reservation.findOne({ _id: id,status: 'completed'});
+    if(isAlreadyCompleted){
+      return res.status(400).send("Booking Is Already Completed")
+    }
+
     const completedReservation = await CompletedReservation.create({
       completeTime,
       user,
@@ -23,7 +30,6 @@ exports.createCompletedReservation = async (req, res) => {
       category,
       price,
     });
-    console.log(user)
     let userX = await User.findOne({ name:user })
     console.log(userX)
 
@@ -38,26 +44,22 @@ exports.createCompletedReservation = async (req, res) => {
       },
       data:{
         notification:{
-          title:'Zainlak Reservations',
-          body:'Your Reservation Is Done'
+          title: "Zain Development Reservation",
+          body: "Your Reservation Is Done"
         },
         to:userX.deviceToken
       }
     })
-    console.log(response.status)
 
-    let notifications = userX.notifications
-    notifications.push({
-      title:"Zainlak Reservations",
-      body:"Your Reservations Is Done",
-      date:Date.now()
-    })
+    let notification = new NotificationModel({
+      userId: userX._id,
+      title: "Zain Development Reservation",
+      body: "Your Reservation Is Done"
+    });
 
-
-    await User.findOneAndUpdate({ name: user},{
-      notifications:notifications
-    },{ $new:true })
-
+    let saved = await notification.save()
+    console.log(notification)
+    console.log(saved)
 
     await Reservation.findOneAndUpdate({ _id: id},{
       status: 'completed'

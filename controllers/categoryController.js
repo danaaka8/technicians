@@ -14,7 +14,7 @@ exports.getAllCategories = async (req, res) => {
 
 exports.createCategory = async (req, res) => {
   try {
-    const { name } = req.body;
+    const { name, nameAr } = req.body;
 
 
     if (req.file.filename == '') {
@@ -44,6 +44,7 @@ exports.createCategory = async (req, res) => {
 
     const category = new Category({
       name: name,
+      nameAr:nameAr,
       image: url
     });
 

@@ -44,14 +44,14 @@ router.get('/subCategories/:id/technicians',async (req,res) =>{
 
 router.post('/subCategories',async (req,res) =>{
     try{
-        const { price, parentCategory, name} = req.body
+        const { price, parentCategory, name, nameAr} = req.body
         console.log(req.body)
 
         if(parentCategory === undefined || name === undefined){
             return res.status(400).send("Missing Data Name Or ParentCategory")
         }
 
-        let subCat = new SubCategory({ price, parentCategory, name })
+        let subCat = new SubCategory({ price, parentCategory, name, nameAr })
         await subCat.save()
 
         return res.status(201).send(`Sub Category ${name} Was Created`)
@@ -81,16 +81,14 @@ router.delete('/subCategories/parentCategory/:id', async (req,res) =>{
 
 router.put('/subCategories/:id', async (req,res) =>{
     try{
-        const { name, price, parentCategory } = req.body
-        console.log(req.body)
-        console.log(req.params.id)
+        const { name,nameAr, price, parentCategory } = req.body
         let isExisting = await SubCategory.find({ name })
         if(!isExisting){
             return res.status(404).send("SubCategory Doesn't Exist")
         }
 
         await SubCategory.findOneAndUpdate({ _id: req.params.id },{
-            name, price, parentCategory
+            name, price, parentCategory, nameAr
         },{ $new: true })
 
         return res.status(200).send(`SubCategory ${name} Was Updated`)

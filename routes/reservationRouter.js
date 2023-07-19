@@ -9,7 +9,7 @@ router.delete('/reservations', reservationController.deleteAllReservations);
 // Get all reservations
 router.get('/reservations', reservationController.getReservations);
 
-router.get('/reservations/user/:userId', reservationController.getUserReservations);
+router.get('/reservations/user', reservationController.getUserReservations);
 
 // Delete a reservation by ID
 router.delete('/reservations/:id', reservationController.deleteReservation);

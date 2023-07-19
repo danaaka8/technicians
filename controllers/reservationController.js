@@ -4,12 +4,13 @@ const Technician = require('../models/technicianModel');
 exports.createReservation = async (req, res) => {
   try {
     const { userId, technicianId, date, time } = req.body;
+    console.log(req.body)
 
     const existingSameReservation = await Reservation.findOne({
       technicianId,
       userId,
       date,
-      time
+      time:time.toString()
     })
 
     if(existingSameReservation){
@@ -20,8 +21,8 @@ exports.createReservation = async (req, res) => {
       technicianId,
       date,
       $or: [
-        { time: { $gt: +time } }, // Check for reservations with time greater than the new reservation
-        { time: { $lt: +time } } // Check for reservations with time less than the new reservation
+        { time: (time + 1).toString() }, // Check for reservations with time greater than the new reservation
+        { time: (time - 1).toString() } // Check for reservations with time less than the new reservation
       ]
     });
 
@@ -37,6 +38,30 @@ exports.createReservation = async (req, res) => {
     });
 
     await reservation.save();
+
+    let response = await axios({
+      method:"POST",
+      url:"https://fcm.googleapis.com/fcm/send",
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization': "key=AAAA5lb3yKE:APA91bFuT_Ut9-5Z0wCJUmYEejppMPdXSgpclNC7kRFz_iLU-JTTsgp5HkAJSlRHuI_K1mh-bopwus4DkdiTf3DCSPHotmAtm_rXUffQq22JbltUljY9G8mtp03-vMFss6LFND-nbm3E"
+      },
+      data:{
+        notification:{
+          title:"Zain Development Reservations",
+          body:"Your Reservation Was Created"
+        },
+        to:userId
+      }
+    })
+
+    let notification = new NotificationModel({
+      userId:userId,
+      title:"Zain Development Reservations",
+      body:"Your Reservation Was Created"
+    })
+
+    await notification.save()
 
     return res.status(201).send('Your booking was created');
   } catch (error) {
@@ -60,11 +85,13 @@ exports.getReservations = async (req, res) => {
   }
 };
 
+const jwt = require('jsonwebtoken')
 exports.getUserReservations = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { token } = req.headers;
+    const decodedToken = jwt.verify(token,'your-secret-key');
 
-    const userReservations = await Reservation.find({ userId }).populate('userId');
+    const userReservations = await Reservation.find({ userId: decodedToken.userId }).populate('userId');
     const reservations = [];
 
     for (const reservation of userReservations) {
@@ -91,18 +118,53 @@ exports.getUserReservations = async (req, res) => {
   }
 };
 
-
+const NotificationModel = require('../models/notifications')
+const axios = require("axios");
 exports.deleteReservation = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const deletedReservation = await Reservation.findByIdAndDelete(id);
-    if (!deletedReservation) {
-      return res.status(404).json({ error: 'Reservation not found' });
+    // if (!deletedReservation) {
+    //   return res.status(404).json({ error: 'Reservation not found' });
+    // }
+
+    let existingReservation = await Reservation.findOne({ _id:id }).populate({
+      path:'userId',
+      ref:'User'
+    })
+
+    if(!existingReservation){
+      return res.status(404).send("Reservation Not Found")
     }
+
+    let response = await axios({
+      method:"POST",
+      url:"https://fcm.googleapis.com/fcm/send",
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization': "key=AAAA5lb3yKE:APA91bFuT_Ut9-5Z0wCJUmYEejppMPdXSgpclNC7kRFz_iLU-JTTsgp5HkAJSlRHuI_K1mh-bopwus4DkdiTf3DCSPHotmAtm_rXUffQq22JbltUljY9G8mtp03-vMFss6LFND-nbm3E"
+      },
+      data:{
+        notification:{
+          title:"Zain Development Reservations",
+          body:"Your Reservation Was Cancelled"
+        },
+        to:existingReservation.userId.deviceToken
+      }
+    })
+
+    let notification = new NotificationModel({
+      userId:existingReservation.userId._id,
+      title:"Zain Development Reservations",
+      body:"Your Reservation Was Cancelled"
+    })
+
+    await notification.save()
+    const deletedReservation = await Reservation.findByIdAndDelete(id);
 
     return res.status(200).json({ message: 'Reservation deleted successfully' });
   } catch (error) {
+    console.log(error.message)
     return res.status(500).json({ error: 'Internal server error' });
   }
 };

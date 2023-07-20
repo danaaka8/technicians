@@ -158,9 +158,10 @@ exports.getUserNotifications = async (req,res) => {
 
 exports.getUser = async (req, res) => {
   try {
-    const userId = req.params.id;
+    const { token } = req.headers
+    const decodedToken = jwt.verify(token, 'your-secret-key');
 
-    const user = await User.findById(userId);
+    const user = await User.findById(decodedToken.userId);
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -276,15 +277,14 @@ exports.getAllFavoriteTechnicians = async (req,res) =>{
 
     for(let tech of techs){
       try{
-        let data = await Technician.findOne({ _id:tech }).populate({
-          path:'category',
-          ref:'Category'
-        });
-        techsArr.push(data)
-
-      }catch(error){
-
-      }
+        if(tech != null){
+          let data = await Technician.findOne({ _id:tech }).populate({
+            path:'category',
+            ref:'Category'
+          });
+          techsArr.push(data)
+        }
+      }catch(error){}
     }
 
     return res.status(200).json(techsArr)
@@ -296,34 +296,41 @@ exports.getAllFavoriteTechnicians = async (req,res) =>{
 
 
 exports.createFavoriteTech = async (req,res) =>{
-  const { userId,id } = req.body
+  const { id } = req.body
+  const { token } = req.headers
+  let decodedToken = jwt.verify(token, 'your-secret-key')
+
+
+
 
   try{
-    let user = await User.findOne({ _id:userId })
+    let user = await User.findOne({ _id:decodedToken.userId })
     let techs = user.favorites
     techs.push(id)
 
-    await User.findOneAndUpdate({_id:userId},{
+    await User.findOneAndUpdate({_id:decodedToken.userId},{
       favorites:techs
-    },{new:true})
+    },{$new:true})
 
     res.json(techs)
-  }catch{
+  }catch(error){
+    console.log(error.message)
     res.status(500).send('something went wrong')
   }
 }
 
 exports.deleteFavoriteTech = async (req,res) =>{
   const { id } = req.params
-  const { userId } = req.body
+  const { token } = req.headers
+  let decodedToken = jwt.verify(token, 'your-secret-key')
 
 
   try{
-    let user = await User.findOne({ _id:userId })
+    let user = await User.findOne({ _id:decodedToken.userId })
     let techs = user.favorites
     let filtered = techs.filter(t => t != id)
 
-    await User.findOneAndUpdate({_id:userId},{
+    await User.findOneAndUpdate({_id:decodedToken.userId},{
       favorites:filtered
     },{new:true})
 
@@ -349,5 +356,22 @@ exports.isFavoriteTechnician = async (req,res) =>{
     }
   }catch (error){
 
+  }
+}
+
+exports.validateToken = (req,res) =>{
+  try{
+    const { token } = req.headers
+    jwt.verify(token, 'your-secret-key',{
+
+    },(error,cb) => {
+      if(error){
+        return res.status(400).send(error)
+      }else{
+        return res.status(200).send(cb)
+      }
+    })
+  }catch (error){
+    return res.status(500).send(error.message)
   }
 }

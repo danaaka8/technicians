@@ -19,7 +19,6 @@ exports.createReservation = async (req, res) => {
 
     const otherExistingReservation = await Reservation.findOne({
       technicianId,
-      userId,
       date,
       time:time.toString()
     })

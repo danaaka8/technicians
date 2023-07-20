@@ -3,12 +3,14 @@ const Technician = require('../models/technicianModel');
 
 exports.createReservation = async (req, res) => {
   try {
-    const { userId, technicianId, date, time } = req.body;
-    console.log(req.body)
+    const { token } = req.headers
+    const { technicianId, date, time } = req.body;
+
+    let decodedToken = jwt.verify(token, 'your-secret-key')
 
     const existingSameReservation = await Reservation.findOne({
       technicianId,
-      userId,
+      userId:decodedToken.userId,
       date,
       time:time.toString()
     })

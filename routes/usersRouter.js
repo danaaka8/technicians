@@ -25,7 +25,7 @@ router.get('/users', UserController.getAllUsers);
 router.put('/users/:id/uploadImage', upload.single('image'),UserController.uploadImage);
 
 
-router.get('/users/:id', UserController.getUser);
+router.get('/users/user', UserController.getUser);
 
 router.post('/users', UserController.register);
 router.get('/users/user/notifications', UserController.getUserNotifications)
@@ -42,6 +42,8 @@ router.get('/users/user/favorites',UserController.getAllFavoriteTechnicians)
 router.get('/users/user/favorites/isFavorite', UserController.isFavoriteTechnician)
 router.delete('/users/favorites/:id',UserController.deleteFavoriteTech)
 router.post('/users/favorites/create',UserController.createFavoriteTech)
+
+router.get('/users/token/validate', UserController.validateToken)
 
 
 module.exports = router

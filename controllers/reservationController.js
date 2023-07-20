@@ -7,6 +7,8 @@ exports.createReservation = async (req, res) => {
     const { technicianId, date, time } = req.body;
 
     let decodedToken = jwt.verify(token, 'your-secret-key')
+    const userData = await User.findOne({ _id: decodedToken.userId });
+
 
     const existingSameReservation = await Reservation.findOne({
       technicianId,
@@ -43,7 +45,7 @@ exports.createReservation = async (req, res) => {
     }
 
     const reservation = new Reservation({
-      userId,
+      userId:decodedToken.userId,
       technicianId,
       date,
       time
@@ -51,7 +53,7 @@ exports.createReservation = async (req, res) => {
 
     await reservation.save();
 
-    let response = await axios({
+    await axios({
       method:"POST",
       url:"https://fcm.googleapis.com/fcm/send",
       headers:{
@@ -63,12 +65,12 @@ exports.createReservation = async (req, res) => {
           title:"Zain Development Reservations",
           body:"Your Reservation Was Created"
         },
-        to:userId
+        to:userData.deviceToken
       }
     })
 
     let notification = new NotificationModel({
-      userId:userId,
+      userId:decodedToken.userId,
       title:"Zain Development Reservations",
       body:"Your Reservation Was Created"
     })
@@ -77,6 +79,7 @@ exports.createReservation = async (req, res) => {
 
     return res.status(201).send('Your booking was created');
   } catch (error) {
+    console.log(error.message)
     return res.status(500).send('Internal server error');
   }
 };
@@ -132,6 +135,7 @@ exports.getUserReservations = async (req, res) => {
 
 const NotificationModel = require('../models/notifications')
 const axios = require("axios");
+const User = require("../models/usersModel");
 exports.deleteReservation = async (req, res) => {
   try {
     const { id } = req.params;

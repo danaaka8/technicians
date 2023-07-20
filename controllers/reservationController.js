@@ -17,6 +17,17 @@ exports.createReservation = async (req, res) => {
       return res.status(400).send("You Already Have This Booking")
     }
 
+    const otherExistingReservation = await Reservation.findOne({
+      technicianId,
+      userId,
+      date,
+      time:time.toString()
+    })
+
+    if(otherExistingReservation){
+      return res.status(400).send("Date Is Taken By Another User")
+    }
+
     const existingDelayedReservations = await Reservation.find({
       technicianId,
       date,
